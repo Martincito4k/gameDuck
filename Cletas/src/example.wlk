@@ -4,10 +4,11 @@ object personaje{
 	var puntos = 0
 	
 	var position = game.center()
+
 	method position(){
 		return position
 	}
-	method image() = "personaje.png"
+	method image() = "personaje2.png"
 	method puntos(){
 		return puntos
 	}
@@ -30,15 +31,19 @@ object personaje{
 		position = position.left(1)
 	}
 	
-	method sumarPuntows(cantidad){
+	method sumarPuntos(cantidad){
 		puntos = puntos + cantidad
+	}
+	method disparar(){
+		juego.removerObstaculo()
+		self.sumarPuntos(10)
 	}
 }
 
 class Auto {
 	var property position
 	var nro
-	method image() = "auto" + nro + ".png"
+	method image() = "basura3" + nro + ".png"
 	method serAgarradaPor(personaje){
 		game.removeVisual(self)
 		personaje.sumarPuntos(nro)
@@ -55,25 +60,28 @@ object puntaje {
 object juego {
 	method iniciar(){
 		
-		game.height(20)
-		game.width(35)
+		game.cellSize(200)
+		game.height(4)
+		game.width(6)
 		game.title("Duck Hunt")
 		self.agregarVisuales()
 		self.configurarTeclas()
-		self.definirColisiones()
+		//self.definirColisiones()
 		self.incorporarObstaculos()
 	}
 	
 	method incorporarObstaculos(){
 		game.onTick(2000, "obstaculo",{self.agregarObstaculo()})
 	}
+	
 	method agregarVisuales(){
-		game.boardGround("wallpaper.jpg")
+		game.boardGround("wallpaper2.jpg")
 		game.addVisual(personaje)
 		10.times({x => self.agregarAuto(x)})
 		game.addVisual(puntaje)
 	}
 	method configurarTeclas(){
+		keyboard.space().onPressDo{personaje.disparar()}
 		keyboard.up().onPressDo{personaje.avanzar()}
 		keyboard.down().onPressDo{personaje.retroceder()}
 		keyboard.right().onPressDo{personaje.derecha()}
@@ -82,6 +90,7 @@ object juego {
 	method definirColisiones(){
 		game.onCollideDo(personaje,{cosa=>cosa.serAgarradaPor(personaje)})
 	}
+	
 	method agregarAuto(valor){
 		game.addVisual(
 			new Auto(
@@ -90,23 +99,32 @@ object juego {
 			)
 		)
 	}
+	
 	method agregarObstaculo(){
 		game.addVisual(
 		new Obstaculo(
-			color=["Rojo", "Verde", "Azul"].anyOne(),
 			position = self.posicionAleatoria()
 		))
 	}
-	method posicionAleatoria() = game.at(1.randomUpTo(game.width()) - 2, 1.randomUpTo(game.height()) - 2)
+	/*
+	method removerObstaculo(){
+		game.removeVisual()
+	}
+*/
+	
+	method posicionAleatoria() = game.at(0.randomUpTo(game.width()), 1.randomUpTo(game.height()))
 }
+
 class Obstaculo {
 	var property position
-	var color
-	method image() = "basura.png"
-	method serAgarradaPor(personaje){
-		personaje.chocar()
+	method image() = "basura3.png"
+	/*method removerObstaculo(){
+		game.removeVisual(self)
+		personaje.sumarPuntos(10)
 	}
+	*/
 }
+/* 
 object background {
 	var position = game.at(game.width() - 25, game.height() - 19)
 	method position(){
@@ -114,3 +132,4 @@ object background {
 	}
 	method image() = "wallpaper.jpg"
 }
+*/
