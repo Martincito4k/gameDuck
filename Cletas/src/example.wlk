@@ -1,17 +1,29 @@
 import wollok.game.*
 
+class Pato {
+	var property position
+	method image() = "basura3.png"
+	method removerPato(){
+		game.removeVisual(self)
+		personaje.sumarPuntos(10)
+	}
+}
+
 object personaje{
 	var puntos = 0
 	
-	var position = game.center()
-
+	var property position = game.center()
+	
 	method position(){
 		return position
 	}
+	
 	method image() = "personaje2.png"
+	
 	method puntos(){
 		return puntos
 	}
+	/*
 	method chocar(){
 		puntos = puntos - 1
 	}
@@ -30,25 +42,17 @@ object personaje{
 	method izquierda(){
 		position = position.left(1)
 	}
-	
+*/
 	method sumarPuntos(cantidad){
 		puntos = puntos + cantidad
 	}
+
 	method disparar(){
-		juego.removerObstaculo()
+		pato.removerPato().at(self)
 		self.sumarPuntos(10)
 	}
 }
 
-class Auto {
-	var property position
-	var nro
-	method image() = "basura3" + nro + ".png"
-	method serAgarradaPor(personaje){
-		game.removeVisual(self)
-		personaje.sumarPuntos(nro)
-	}
-}
 object puntaje {
 		method position() = game.at(game.width() - 1, game.height() - 1)
 		method text() = personaje.puntos().toString()
@@ -67,47 +71,42 @@ object juego {
 		self.agregarVisuales()
 		self.configurarTeclas()
 		//self.definirColisiones()
-		self.incorporarObstaculos()
+		self.incorporarPato()
 	}
 	
-	method incorporarObstaculos(){
-		game.onTick(2000, "obstaculo",{self.agregarObstaculo()})
+	method incorporarPato(){
+		game.onTick(8000, "pato",{self.agregarPato()})
 	}
 	
 	method agregarVisuales(){
 		game.boardGround("wallpaper2.jpg")
-		game.addVisual(personaje)
-		10.times({x => self.agregarAuto(x)})
+		game.addVisualCharacter(personaje)
 		game.addVisual(puntaje)
 	}
 	method configurarTeclas(){
 		keyboard.space().onPressDo{personaje.disparar()}
-		keyboard.up().onPressDo{personaje.avanzar()}
+		/* keyboard.up().onPressDo{personaje.avanzar()}
 		keyboard.down().onPressDo{personaje.retroceder()}
 		keyboard.right().onPressDo{personaje.derecha()}
 		keyboard.left().onPressDo{personaje.izquierda()}
+		keyboard.w().onPressDo{personaje.avanzar()}
+		keyboard.s().onPressDo{personaje.retroceder()}
+		keyboard.d().onPressDo{personaje.derecha()}
+		keyboard.a().onPressDo{personaje.izquierda()}
+		*/
 		}
 	method definirColisiones(){
 		game.onCollideDo(personaje,{cosa=>cosa.serAgarradaPor(personaje)})
 	}
 	
-	method agregarAuto(valor){
+	method agregarPato(){
 		game.addVisual(
-			new Auto(
-				position= game.at(valor,10),
-				 nro = valor % 5 + 1
-			)
-		)
-	}
-	
-	method agregarObstaculo(){
-		game.addVisual(
-		new Obstaculo(
+		new Pato(
 			position = self.posicionAleatoria()
 		))
 	}
 	/*
-	method removerObstaculo(){
+	method removerPato(){
 		game.removeVisual()
 	}
 */
@@ -115,15 +114,6 @@ object juego {
 	method posicionAleatoria() = game.at(0.randomUpTo(game.width()), 1.randomUpTo(game.height()))
 }
 
-class Obstaculo {
-	var property position
-	method image() = "basura3.png"
-	/*method removerObstaculo(){
-		game.removeVisual(self)
-		personaje.sumarPuntos(10)
-	}
-	*/
-}
 /* 
 object background {
 	var position = game.at(game.width() - 25, game.height() - 19)
@@ -133,3 +123,8 @@ object background {
 	method image() = "wallpaper.jpg"
 }
 */
+
+//Tengo que cambiar el personaje para implementarlo directamente con addVisualCharacter y que
+// lo interprete directamente como pj para asi al utilizar el removeVisual solo puede eliminar al
+// pato, no estaria mal que guarde la posicion de cada pato como una lista y que ese elemento no puede
+// ser repetido, ademas necesito implementar lo mismo con el pj para reconocer dnd esta para disparar
